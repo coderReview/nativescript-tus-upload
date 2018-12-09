@@ -1,0 +1,8 @@
+
+android {
+	
+}
+
+dependencies {
+    // Describe plugin native Android dependencies like
+}
