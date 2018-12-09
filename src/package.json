@@ -44,6 +44,7 @@
     "homepage": "https://github.com/coderReview/nativescript-tus-upload",
     "readmeFilename": "README.md",
     "devDependencies": {
+        "@types/node": "^10.12.12",
         "tns-core-modules": "^5.0.1",
         "tns-platform-declarations": "^5.0.0",
         "typescript": "~3.2.1",
@@ -51,9 +52,6 @@
         "rimraf": "^2.6.2",
         "tslint": "^5.11.0",
         "semver": "^5.6.0"
-    },
-    "dependencies": {
-        "@types/node": "^10.12.12"
     },
     "bootstrapper": "nativescript-plugin-seed"
 }

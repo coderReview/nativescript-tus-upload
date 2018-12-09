@@ -1,5 +1,5 @@
 import { Observable } from 'tns-core-modules/data/observable';
-import { UploadTus } from 'nativescript-upload-tus';
+import { UploadTus } from 'nativescript-tus-upload';
 import * as fs from 'tns-core-modules/file-system';
 
 export class HelloWorldModel extends Observable {
