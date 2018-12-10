@@ -1,5 +1,11 @@
 import * as fs from "tns-core-modules/file-system";
 
+export interface UploadTusOptions {
+  path: string;
+  url: string;
+  headers: any;
+}
+
 export class UploadTus {
   private store: TUSUploadStore;
 
@@ -8,24 +14,26 @@ export class UploadTus {
     this.store = TUSFileUploadStore.alloc().initWithURL(URL);
   }
 
-  public uploadFile(url: string, path: string, callback: (error?: any) => void) {
-    const fileUrl = NSURL.fileURLWithPath(path);
+  public uploadFile(options: UploadTusOptions, callback: (response: any) => void) {
+    const fileUrl = NSURL.fileURLWithPath(options.path);
     if (!fileUrl.checkResourceIsReachableAndReturnError()) {
-      callback({ error: `file ${path} doesn't exists` });
+      callback({ error: `file ${options.path} doesn't exists` });
       return;
     }
 
-    const uploadEndpoint = NSURL.URLWithString(url);
+    const uploadEndpoint = NSURL.URLWithString(options.url);
 
     const session = TUSSession.alloc().initWithEndpointDataStoreAllowsCellularAccess(uploadEndpoint, this.store, true);
-    const upload = session.createUploadFromFileHeadersMetadata(fileUrl, NSDictionary.new(), NSDictionary.new());
+    const upload = session.createUploadFromFileHeadersMetadata(fileUrl, this.toDictionary(options.headers),
+        NSMutableDictionary.new<string, string>());
 
     if (upload) {
       upload.progressBlock = (bytesWritten, bytesTotal) => {
         console.log(`Progress: ${Math.floor(100 * bytesWritten / bytesTotal)}`);
       };
       upload.resultBlock = (url: NSURL) => {
-        callback();
+        const replaceUrl = options.url.endsWith('/') ? '/' : '';
+        callback({ url: url.absoluteString.replace(options.url, replaceUrl), relativeUrl: url.relativeString });
       };
       upload.failureBlock = (error: NSError) => {
         callback({ error: error.localizedDescription });
@@ -34,5 +42,21 @@ export class UploadTus {
     } else {
       callback({ error: 'couldn\'t create upload object' });
     }
+  }
+
+  private toDictionary(obj): NSDictionary<string, string> {
+    let node = NSMutableDictionary.new<string, string>();
+    for (let property in obj) {
+      if (obj.hasOwnProperty(property)) {
+        if (obj[property] != null) {
+          switch (typeof obj[property]) {
+            case 'string':
+              node.setObjectForKey(String(obj[property]), property);
+              break;
+          }
+        }
+      }
+    }
+    return node;
   }
 }

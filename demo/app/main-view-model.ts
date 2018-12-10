@@ -13,15 +13,20 @@ export class HelloWorldModel extends Observable {
     const file = folder.getFile('temp.txt');
     file.writeTextSync('A TEXT TO WRITE A FILE\nA TEXT TO WRITE A FILE\nA TEXT TO WRITE A FILE\n');
 
-    const url = 'https://tus-tmp-pvms.herokuapp.com:443/';
+    const url = 'https://tus-tmp-pvms.herokuapp.com/';
 
+    console.log('WILL UPLOAD');
     this.uploadTus = new UploadTus();
-    this.uploadTus.uploadFile(url, file.path, (err: any) => {
-      if (err) {
-        console.error(err);
+    this.uploadTus.uploadFile({
+      path: file.path,
+      url: url,
+      headers: { 'Authorization': 'Bearer TEST' }
+    }, (response: any) => {
+      if (response.error) {
+        console.error(response.error);
         return;
       }
-      console.log(`DID UPLOAD ${url}`);
+      console.log(`DID UPLOAD ${JSON.stringify(response, null, 2)}`);
     });
   }
 }

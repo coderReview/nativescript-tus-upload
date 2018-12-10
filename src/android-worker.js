@@ -11,7 +11,7 @@ if (global['TNS_WEBPACK']) {
 const utils = require('tns-core-modules/utils/utils');
 const application = require('tns-core-modules/application');
 
-global.onmessage = function(msg) {
+global.onmessage = function (msg) {
   application.on(application.uncaughtErrorEvent, function (args) {
     if (args.android) {
       // For Android applications, args.android is an NativeScriptError.
@@ -33,7 +33,8 @@ global.onmessage = function(msg) {
     const pref = utils.ad.getApplicationContext().getSharedPreferences('tus', 0);
     const client = new io.tus.java.client.TusClient();
 
-    client.setUploadCreationURL(new java.net.URL(msg.data.baseUrl));
+    client.setUploadCreationURL(new java.net.URL(msg.data.url));
+    client.setHeaders(toHashMap(msg.data.headers));
     client.enableResuming(new io.tus.android.client.TusPreferencesURLStore(pref));
 
     const uploader = client.resumeOrCreateUpload(upload);
@@ -45,15 +46,32 @@ global.onmessage = function(msg) {
       let totalBytes = upload.getSize();
       let bytesUploaded = uploader.getOffset();
       let progress = bytesUploaded / totalBytes * 100;
-  
+
       global.postMessage({ progress: progress });
     } while (uploader.uploadChunk() > -1);
-  
+
     // Allow the HTTP connection to be closed and cleaned up
     uploader.finish();
-    global.postMessage({});
+
+    const replaceUrl = msg.data.url.endsWith('/') ? '/' : '';
+    global.postMessage({ url: uploader.getUploadURL().toString().replace(msg.data.url, replaceUrl) });
   } catch (ex) {
-    console.error(typeof ex);
-    global.postMessage({ error: ex });
+    global.postMessage({ error: ex.message || ex });
   }
 };
+
+function toHashMap(obj) {
+  var node = new java.util.HashMap();
+  for (var property in obj) {
+    if (obj.hasOwnProperty(property)) {
+      if (obj[property] != null) {
+        switch (typeof obj[property]) {
+          case 'string':
+            node.put(property, String(obj[property]));
+            break;
+        }
+      }
+    }
+  }
+  return node;
+}

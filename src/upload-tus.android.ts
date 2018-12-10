@@ -1,20 +1,23 @@
 
 declare const io: any;
 
+export interface UploadTusOptions {
+  path: string;
+  url: string;
+  headers: any;
+}
+
 export class UploadTus extends io.tus.java.client.TusExecutor {
   private callback: (error?: any) => void;
 
-  private url: string;
-
-  private path: string;
+  private options: UploadTusOptions;
 
   constructor() {
     super();
   }
 
-  public uploadFile(url: string, path: string, callback: (error?: any) => void) {
-    this.url = url;
-    this.path = path;
+  public uploadFile(options: UploadTusOptions, callback: (response: any) => void) {
+    this.options = options;
     this.callback = callback;
     this.makeAttempts();
   }
@@ -27,20 +30,20 @@ export class UploadTus extends io.tus.java.client.TusExecutor {
     } else {
       worker = new Worker("./android-worker.js");
     }
-    worker.postMessage({ path: this.path, baseUrl: this.url });
+    worker.postMessage(this.options);
 
     worker.onmessage = (msg: any) => {
-      if (msg.data.progress) {
+      if (msg.data.progress !== undefined) {
         console.log(`Progress: ${msg.data.progress}%`);
-      } else if (msg.data.error) {
+      } else if (msg.data.error !== undefined) {
         console.error(msg.data.error);
         this.callback({ error: msg.data.error });
-      } else {
-        this.callback();
+      } else if (msg.data.url !== undefined) {
+        this.callback({ url: msg.data.url });
       }
     };
     worker.onerror = (error) => {
-      console.error(error);
+      // console.error(error);
       this.callback({ error: error });
     };
   }

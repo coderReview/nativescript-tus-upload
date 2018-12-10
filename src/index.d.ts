@@ -1,4 +1,10 @@
+export interface UploadTusOptions {
+  path: string;
+  url: string;
+  headers: any;
+}
+
 export declare class UploadTus {
   constructor();
-  public uploadFile(url: string, path: string, callback: (error?: any) => void);
+  public uploadFile(options: UploadTusOptions, callback: (response: any) => void);
 }

@@ -1,4 +1,4 @@
-var UploadTus = require("nativescript-upload-tus").UploadTus;
+var UploadTus = require("nativescript-tus-upload").UploadTus;
 var uploadTus = new UploadTus();
 
 describe("greet function", function() {
