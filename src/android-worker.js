@@ -45,7 +45,7 @@ global.onmessage = function (msg) {
       // the current offset.
       let totalBytes = upload.getSize();
       let bytesUploaded = uploader.getOffset();
-      let progress = bytesUploaded / totalBytes * 100;
+      let progress = Math.floor(bytesUploaded / totalBytes * 100);
 
       global.postMessage({ progress: progress });
     } while (uploader.uploadChunk() > -1);

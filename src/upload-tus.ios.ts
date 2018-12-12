@@ -29,7 +29,7 @@ export class UploadTus {
 
     if (upload) {
       upload.progressBlock = (bytesWritten, bytesTotal) => {
-        console.log(`Progress: ${Math.floor(100 * bytesWritten / bytesTotal)}`);
+        callback({ progress: Math.floor(100 * bytesWritten / bytesTotal) });
       };
       upload.resultBlock = (url: NSURL) => {
         const replaceUrl = options.url.endsWith('/') ? '/' : '';

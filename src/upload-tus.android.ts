@@ -34,7 +34,7 @@ export class UploadTus extends io.tus.java.client.TusExecutor {
 
     worker.onmessage = (msg: any) => {
       if (msg.data.progress !== undefined) {
-        console.log(`Progress: ${msg.data.progress}%`);
+        this.callback({ progress: msg.data.progress });
       } else if (msg.data.error !== undefined) {
         console.error(msg.data.error);
         this.callback({ error: msg.data.error });
