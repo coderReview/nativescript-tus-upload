@@ -1,6 +1,6 @@
 {
   "name": "nativescript-tus-upload",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "NativeScript tus protocol upload plugin.",
   "devDependencies": {
     "ncp": "^2.0.0",
